@@ -1,7 +1,8 @@
 from pico2d import load_image, get_time
+from sdl2 import SDL_KEYDOWN, SDLK_a
 
 from Lecture10_Character_Controller_1.state_machine import StateMachine, time_out, space_down, left_down, right_down, \
-    left_up, right_up, start_event
+    left_up, right_up, start_event, a_down
 
 
 # 상태를 Class를 통해서 정의
@@ -19,7 +20,7 @@ class Idle:
         boy.frame = 0
         # 현재 시간을 저장
         boy.start_time = get_time()
-        pass
+
     @staticmethod
     def exit(boy,e):
         pass
@@ -44,6 +45,7 @@ class Sleep:
     @staticmethod
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
+
 
     @staticmethod
     def draw(boy):
@@ -89,10 +91,12 @@ class AutoRun:
 
     @staticmethod
     def exit(boy,e):
-        boy.scale = 1
-        boy.auto_speed = 5
+        #boy.scale = 1
+        #boy.auto_speed = 5
+        pass
     @staticmethod
     def do(boy):
+        boy.frame = (boy.frame + 1) % 8
         boy.auto_speed += 0.1
         boy.scale += 0.01
 
@@ -124,9 +128,9 @@ class Boy:
         self.state_machine.start(Idle) #초기 상태가 Idle
         self.state_machine.set_transitions(
             {
-                Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, time_out: Sleep},
-                Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run, space_down: Idle},
-                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle},
+                Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, time_out: Sleep, a_down: AutoRun},
+                Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run, space_down: Idle, a_down: AutoRun},
+                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, a_down: AutoRun},
                 AutoRun: {right_down: Run, left_down: Run, right_up: Run, left_up: Run, time_out: Idle}
             }
         )
@@ -138,8 +142,10 @@ class Boy:
     def handle_event(self, event):
         # event: 입력 이벤트
         # 우리가 state machine에게 전달해줄건 (  ,  )
-        self.state_machine.add_event(('INPUT', event))
-
+        if event.type == SDL_KEYDOWN and event.key == SDLK_a:  # 'a' 키 눌림 확인
+            self.state_machine.add_event(('a_down', event))  # a_down 이벤트 추가
+        else:
+            self.state_machine.add_event(('INPUT', event))
     def draw(self):
         self.state_machine.draw()
 
