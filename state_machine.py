@@ -1,6 +1,7 @@
 #이벤트 체크 함수 정의
 #상태 이벤트 e = (종류, 실제값) 튜플로 정의
-from sdl2 import SDLK_SPACE, SDL_KEYDOWN, SDLK_RIGHT, SDLK_LEFT, SDL_KEYUP
+from sdl2 import SDLK_SPACE, SDL_KEYDOWN, SDLK_RIGHT, SDLK_LEFT, SDL_KEYUP, SDLK_a
+
 
 def start_event(e):
     return e[0] == 'START'
@@ -22,6 +23,9 @@ def space_down(e): #e가 space down 인지 판단 T/F
 
 def time_out(e): #e가 타임 아웃 인지 판단
     return e[0] == 'TIME OUT'
+
+def a_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
 
 
 class StateMachine:
