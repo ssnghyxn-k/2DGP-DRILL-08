@@ -80,16 +80,38 @@ class Run:
 class AutoRun:
     @staticmethod
     def enter(boy,e):
-        pass
+        boy.auto_speed = 5
+        boy.scale = 1
+        boy.start_time = get_time()
+
+        if boy.dir == 0:
+            boy.dir = 1
+
     @staticmethod
     def exit(boy,e):
-        pass
+        boy.scale = 1
+        boy.auto_speed = 5
     @staticmethod
     def do(boy):
-        pass
+        boy.auto_speed += 0.1
+        boy.scale += 0.01
+
+        boy.x += boy.dir * boy.auto_speed
+
+        if boy.x >= 800 - (50 * boy.scale):
+            boy.dir = -1
+        elif boy.x <= 0 + (50 * boy.scale):
+            boy.dir = 1
+
+        if get_time() - boy.start_time > 5:
+            boy.state_machine.add_event(('TIME OUT', 0))
+
     @staticmethod
     def draw(boy):
-        pass
+        boy.image.clip_draw(
+            boy.frame*100, boy.action*100, 100, 100,
+            boy.x, boy.y, 100*boy.scale, 100*boy.scale
+        )
 
 class Boy:
     def __init__(self):
